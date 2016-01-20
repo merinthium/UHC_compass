@@ -1,8 +1,6 @@
-package tracker;
+package me.merinthium.com.uhc;
 
 import java.util.Comparator;
-
-import me.merinthium.com.Main;
 
 import org.bukkit.entity.Player;
 

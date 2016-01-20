@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import me.merinthium.com.Main;
+import me.merinthium.com.uhc.TrackerComparer;
+import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -24,14 +26,14 @@ public class TrackerTask extends BukkitRunnable
 	@Override
 	public void run() 
 	{
-		String message = "" + ChatColor.RED + ChatColor.BOLD + "NO Target Near";
+		String message = "" + ChatColor.RED + ChatColor.BOLD + "NO TARGET NEAR";
 		
 		List<Player> players = new ArrayList<> ();
 		for (Player p : player.getWorld().getPlayers())
 		{
 			if(!(p.getUniqueId().equals(player.getUniqueId()))
-				|| (player.canSee(p))
-				|| !(p.getGameMode().equals(GameMode.SPECTATOR)))
+				&& (player.canSee(p))
+				&& !(p.getGameMode().equals(GameMode.SPECTATOR)))
 			{
 					players.add(p);
 			}		
@@ -39,15 +41,15 @@ public class TrackerTask extends BukkitRunnable
 		
 		Collections.sort(players, new TrackerComparer (player));
 		Player nearest = null; 
-		
+
 		if (players.size() > 0)
 		{
 			nearest = players.get(0);
 			message = "" + ChatColor.WHITE + "TARGET " + ChatColor.GREEN + nearest.getName() 
-					+ "" + ChatColor.WHITE + "DISTANCE: " + ChatColor.GREEN + "" +((int) nearest.getLocation().distance(player.getLocation()));
+					+ "" + ChatColor.WHITE + "DISTANCE: " + ChatColor.GREEN + " " +((int) nearest.getLocation().distance(player.getLocation())) + ChatColor.WHITE + " BLOCKS";
 		}
 		
-		((org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer) player).getHandle().playerConnection.sendPacket (new net.minecraft.server.v1_8_R3.PacketPlayOutChat(
+		((CraftPlayer) player).getHandle().playerConnection.sendPacket (new PacketPlayOutChat(
 				net.minecraft.server.v1_8_R3.IChatBaseComponent.ChatSerializer.a ("{\"text\" : \"" + (
 						player.getItemInHand().getType().equals(Material.COMPASS) ? message : " ") + "\"}"), (byte) 2));
 		try 
